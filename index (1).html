@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Papan Penjualan UMKM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef2ee;--surface:#fff;--col:#e2e9e3;--ink:#16241d;--mute:#5d6f64;--line:#cdd8cf;--brand:#0f6b4f;--brandink:#fff;--danger:#b3261e;
+--c0:#8a6bd1;--c1:#e0902b;--c2:#2b86c5;--c3:#c0508a;--c4:#2f9e62;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1713;--surface:#1b2822;--col:#15201a;--ink:#e8f0ea;--mute:#93a79a;--line:#2b3b33;--brand:#4fd1a0;--brandink:#06241a;--danger:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1713;--surface:#1b2822;--col:#15201a;--ink:#e8f0ea;--mute:#93a79a;--line:#2b3b33;--brand:#4fd1a0;--brandink:#06241a;--danger:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;padding:20px 20px 12px}
+h1{margin:0;font-weight:800;font-size:clamp(22px,4vw,32px);letter-spacing:-.02em}
+.sub{color:var(--mute);margin:2px 0 0}
+.omzet{text-align:right}.omzet b{display:block;font-size:clamp(22px,4vw,30px);font-weight:800;color:var(--brand)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}
+input,select,button{font:inherit;color:inherit}
+input,select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.tools input{max-width:260px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px}
+button.pri{background:var(--brand);color:var(--brandink);border-color:var(--brand);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.board{display:flex;gap:12px;padding:0 20px 24px;overflow-x:auto;align-items:flex-start}
+.col{flex:0 0 272px;background:var(--col);border-radius:12px;border-top:4px solid var(--cc);padding:10px;min-height:140px}
+.col.over{outline:2px dashed var(--cc)}
+.col h2{margin:0;font-size:16px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.col .sum{color:var(--mute);font-size:13px;margin:0 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:grab}
+.card.drag{opacity:.4}
+.card strong{display:block}.card .p{color:var(--mute);font-size:13px}
+.card .v{font-weight:600;margin:6px 0}
+.acts{display:flex;gap:4px;justify-content:space-between}
+.acts button{padding:4px 9px;font-size:13px}
+.acts .r{margin-left:auto;display:flex;gap:4px}
+.empty{color:var(--mute);font-size:13px;text-align:center;padding:14px 0}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);width:min(92vw,380px);padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:0 0 12px}label{display:block;margin:0 0 10px;font-size:13px;color:var(--mute)}
+label input,label select{margin-top:4px;color:var(--ink)}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.del{color:var(--danger)}
+.err{color:var(--danger);font-size:13px;margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Papan Penjualan Warung Berkah</h1>
+    <p class="sub">Pantau pesanan dari prospek sampai lunas.</p>
+  </div>
+  <div class="omzet"><span class="sub">Omzet lunas</span><b id="omzet">Rp0</b></div>
+</header>
+<div class="tools">
+  <input id="cari" type="search" placeholder="Cari pelanggan atau produk" aria-label="Cari pesanan">
+  <button class="pri" id="tambah">Tambah pesanan</button>
+  <button id="reset">Kembalikan contoh data</button>
+</div>
+<main class="board" id="board"></main>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<dialog id="dlg">
+  <form method="dialog" id="frm">
+    <h3 id="jdl">Pesanan baru</h3>
+    <label>Nama pelanggan<input id="fn" required maxlength="40"></label>
+    <label>Produk<input id="fp" required maxlength="60"></label>
+    <label>Nilai (Rp)<input id="fv" type="number" min="0" step="1000" required></label>
+    <label>Tahap<select id="fs"></select></label>
+    <p class="err" id="err" role="alert" hidden></p>
+    <div class="row"><button type="button" id="batal">Batal</button><button class="pri" type="submit">Simpan pesanan</button></div>
+  </form>
+</dialog>
+
+<script>
+(()=>{
+"use strict";
+const COLS=[{id:"prospek",t:"Prospek"},{id:"nego",t:"Negosiasi"},{id:"proses",t:"Diproses"},{id:"kirim",t:"Dikirim"},{id:"lunas",t:"Lunas"}];
+const IDS=COLS.map(c=>c.id);
+const KEY="kanban-umkm-v1";
+const SAMPLE=[
+ {id:1,nama:"Bu Sari",produk:"Keripik tempe 50 bungkus",nilai:750000,status:"prospek"},
+ {id:2,nama:"Kafe Senja",produk:"Kopi bubuk 20 kg",nilai:2400000,status:"nego"},
+ {id:3,nama:"Pak Dedi",produk:"Sambal botol 100 pcs",nilai:1500000,status:"proses"},
+ {id:4,nama:"Toko Maju",produk:"Kerupuk udang 30 kg",nilai:1350000,status:"kirim"},
+ {id:5,nama:"Katering Ibu Rina",produk:"Bumbu rendang 40 pak",nilai:1200000,status:"lunas"}
+];
+let editId=null, dragId=null, q="";
+const $=s=>document.querySelector(s);
+const rp=n=>"Rp"+Number(n).toLocaleString("id-ID");
+const newId=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():"id-"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+
+// Validasi tiap kartu dari penyimpanan: kartu rusak dibuang, bukan membuat kartu "hilang"
+function clean(d){
+  if(!Array.isArray(d))return null;
+  return d.filter(c=>c&&typeof c==="object"&&IDS.includes(c.status)&&typeof c.nama==="string"&&typeof c.produk==="string")
+    .map(c=>({id:c.id!=null?c.id:newId(),nama:c.nama.slice(0,40),produk:c.produk.slice(0,60),nilai:Math.max(0,Number(c.nilai)||0),status:c.status}));
+}
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r){const d=clean(JSON.parse(r));if(d)return d}}catch(e){}
+  return SAMPLE.map(c=>({...c}));
+}
+let cards=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(cards))}catch(e){}}
+function h(tag,props={},...kids){
+  const el=document.createElement(tag);
+  for(const k in props){if(k==="class")el.className=props[k];else if(k.startsWith("on"))el.addEventListener(k.slice(2),props[k]);else el.setAttribute(k,props[k])}
+  kids.forEach(x=>el.append(x));return el;
+}
+function say(t){$("#live").textContent=t}
+function move(id,to){
+  const c=cards.find(x=>x.id===id);
+  if(c&&c.status!==to){c.status=to;save();render();say(c.nama+" dipindah ke "+COLS.find(k=>k.id===to).t)}
+}
+
+function render(){
+  const b=$("#board");b.replaceChildren();
+  const f=q.trim().toLowerCase();
+  COLS.forEach((col,i)=>{
+    const list=cards.filter(c=>c.status===col.id&&(c.nama+" "+c.produk).toLowerCase().includes(f));
+    const total=list.reduce((s,c)=>s+Number(c.nilai),0);
+    const el=h("section",{class:"col",style:"--cc:var(--c"+i+")","aria-label":col.t});
+    el.append(h("h2",{},col.t,h("span",{},String(list.length))),h("p",{class:"sum"},rp(total)));
+    if(!list.length)el.append(h("div",{class:"empty"},f?"Tidak ada hasil":"Belum ada pesanan"));
+    list.forEach(c=>el.append(cardEl(c,i)));
+    el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("over")});
+    el.addEventListener("dragleave",e=>{if(!el.contains(e.relatedTarget))el.classList.remove("over")});
+    el.addEventListener("drop",e=>{e.preventDefault();el.classList.remove("over");if(dragId!=null)move(dragId,col.id)});
+    b.append(el);
+  });
+  $("#omzet").textContent=rp(cards.filter(c=>c.status==="lunas").reduce((s,c)=>s+Number(c.nilai),0));
+}
+function cardEl(c,i){
+  const el=h("article",{class:"card",draggable:"true"});
+  el.addEventListener("dragstart",()=>{dragId=c.id;el.classList.add("drag")});
+  el.addEventListener("dragend",()=>{dragId=null;el.classList.remove("drag")});
+  const prev=h("button",{"aria-label":"Pindah ke tahap sebelumnya",onclick:()=>move(c.id,COLS[i-1].id)},"\u2190");
+  const next=h("button",{"aria-label":"Pindah ke tahap berikutnya",onclick:()=>move(c.id,COLS[i+1].id)},"\u2192");
+  if(i===0)prev.disabled=true;
+  if(i===COLS.length-1)next.disabled=true;
+  el.append(h("strong",{},c.nama),h("span",{class:"p"},c.produk),h("div",{class:"v"},rp(c.nilai)),
+    h("div",{class:"acts"},prev,h("div",{class:"r"},
+      h("button",{onclick:()=>openForm(c)},"Ubah"),
+      h("button",{class:"del",onclick:()=>{if(confirm("Hapus pesanan "+c.nama+"?")){cards=cards.filter(x=>x.id!==c.id);save();render()}}},"Hapus"),next)));
+  return el;
+}
+function showErr(m){const e=$("#err");e.textContent=m;e.hidden=!m}
+function openForm(c){
+  editId=c?c.id:null;
+  showErr("");
+  $("#jdl").textContent=c?"Ubah pesanan":"Pesanan baru";
+  $("#fn").value=c?c.nama:"";$("#fp").value=c?c.produk:"";$("#fv").value=c?c.nilai:"";
+  $("#fs").value=c?c.status:"prospek";
+  $("#dlg").showModal();$("#fn").focus();
+}
+COLS.forEach(c=>$("#fs").append(h("option",{value:c.id},c.t)));
+$("#frm").addEventListener("submit",e=>{
+  e.preventDefault(); // dialog hanya ditutup bila data sah
+  const d={nama:$("#fn").value.trim(),produk:$("#fp").value.trim(),nilai:Math.max(0,Number($("#fv").value)||0),status:$("#fs").value};
+  if(!d.nama||!d.produk){showErr("Nama pelanggan dan produk tidak boleh kosong.");return}
+  const old=editId!=null?cards.find(x=>x.id===editId):null;
+  if(old)Object.assign(old,d);else cards.push({id:newId(),...d});
+  save();render();$("#dlg").close();
+});
+$("#batal").onclick=()=>$("#dlg").close();
+$("#tambah").onclick=()=>openForm(null);
+$("#cari").oninput=e=>{q=e.target.value;render()};
+$("#reset").onclick=()=>{if(confirm("Ganti semua data dengan contoh data?")){cards=SAMPLE.map(c=>({...c}));save();render()}};
+render();
+})();
+</script>
+</body>
+</html>
