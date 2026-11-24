@@ -1,0 +1,38 @@
+:root{--bg:#eef2ee;--surface:#fff;--col:#e2e9e3;--ink:#16241d;--mute:#5d6f64;--line:#cdd8cf;--brand:#0f6b4f;--brandink:#fff;--danger:#b3261e;
+--c0:#8a6bd1;--c1:#e0902b;--c2:#2b86c5;--c3:#c0508a;--c4:#2f9e62;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1713;--surface:#1b2822;--col:#15201a;--ink:#e8f0ea;--mute:#93a79a;--line:#2b3b33;--brand:#4fd1a0;--brandink:#06241a;--danger:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1713;--surface:#1b2822;--col:#15201a;--ink:#e8f0ea;--mute:#93a79a;--line:#2b3b33;--brand:#4fd1a0;--brandink:#06241a;--danger:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;padding:20px 20px 12px}
+h1{margin:0;font-weight:800;font-size:clamp(22px,4vw,32px);letter-spacing:-.02em}
+.sub{color:var(--mute);margin:2px 0 0}
+.omzet{text-align:right}.omzet b{display:block;font-size:clamp(22px,4vw,30px);font-weight:800;color:var(--brand)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 14px}
+input,select,button{font:inherit;color:inherit}
+input,select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.tools input{max-width:260px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px}
+button.pri{background:var(--brand);color:var(--brandink);border-color:var(--brand);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.board{display:flex;gap:12px;padding:0 20px 24px;overflow-x:auto;align-items:flex-start}
+.col{flex:0 0 272px;background:var(--col);border-radius:12px;border-top:4px solid var(--cc);padding:10px;min-height:140px}
+.col.over{outline:2px dashed var(--cc)}
+.col h2{margin:0;font-size:16px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.col .sum{color:var(--mute);font-size:13px;margin:0 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:grab}
+.card.drag{opacity:.4}
+.card strong{display:block}.card .p{color:var(--mute);font-size:13px}
+.card .v{font-weight:600;margin:6px 0}
+.acts{display:flex;gap:4px;justify-content:space-between}
+.acts button{padding:4px 9px;font-size:13px}
+.acts .r{margin-left:auto;display:flex;gap:4px}
+.empty{color:var(--mute);font-size:13px;text-align:center;padding:14px 0}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);width:min(92vw,380px);padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{margin:0 0 12px}label{display:block;margin:0 0 10px;font-size:13px;color:var(--mute)}
+label input,label select{margin-top:4px;color:var(--ink)}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.del{color:var(--danger)}
