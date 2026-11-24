@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Papan Penjualan UMKM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>Papan Penjualan Warung Berkah</h1>
+    <p class="sub">Pantau pesanan dari prospek sampai lunas.</p>
+  </div>
+  <div class="omzet"><span class="sub">Omzet lunas</span><b id="omzet">Rp0</b></div>
+</header>
+<div class="tools">
+  <input id="cari" type="search" placeholder="Cari pelanggan atau produk" aria-label="Cari pesanan">
+  <button class="pri" id="tambah">Tambah pesanan</button>
+  <button id="reset">Kembalikan contoh data</button>
+</div>
+<main class="board" id="board"></main>
+
+<dialog id="dlg">
+  <form method="dialog" id="frm">
+    <h3 id="jdl">Pesanan baru</h3>
+    <label>Nama pelanggan<input id="fn" required maxlength="40"></label>
+    <label>Produk<input id="fp" required maxlength="60"></label>
+    <label>Nilai (Rp)<input id="fv" type="number" min="0" step="1000" required></label>
+    <label>Tahap<select id="fs"></select></label>
+    <div class="row"><button type="button" id="batal">Batal</button><button class="pri" type="submit">Simpan pesanan</button></div>
+  </form>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
